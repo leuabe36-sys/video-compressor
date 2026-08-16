@@ -1,0 +1,40 @@
+# Render Blueprint for Video Compressor API
+# Deploy: https://dashboard.render.com/blueprints
+
+services:
+  - type: web
+    name: video-compressor-api
+    runtime: docker
+    plan: standard  # Options: free, starter, standard, standard_plus
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: WORKERS
+        value: "1"
+      - key: MAX_FILE_SIZE
+        value: "1073741824"  # 1GB - adjust based on plan
+      - key: CLEANUP_HOURS
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /
+    # Uncomment for persistent storage:
+    # disk:
+    #   name: video-outputs
+    #   mountPath: /app/outputs
+    #   sizeGB: 5
+
+# Optional: Cron job to keep free tier awake
+#  - type: cron
+#    name: keepalive
+#    runtime: docker
+#    plan: free
+#    dockerfilePath: ./Dockerfile
+#    schedule: "*/10 * * * *"
+#    envVars:
+#      - key: KEEPALIVE_URL
+#        value: https://video-compressor-api.onrender.com
+#    startCommand: curl -s $KEEPALIVE_URL/ > /dev/null
